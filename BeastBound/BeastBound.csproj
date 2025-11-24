@@ -46,11 +46,17 @@
     <Compile Include="Battle.cs" />
     <Compile Include="Configurations.cs" />
     <Compile Include="Database.cs" />
+    <Compile Include="Game.cs" />
     <Compile Include="Handler.cs" />
+    <Compile Include="Input.cs" />
     <Compile Include="Map.cs" />
     <Compile Include="Menu.cs" />
+    <Compile Include="Npc.cs" />
+    <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Renderer.cs" />
+    <Compile Include="Tile.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

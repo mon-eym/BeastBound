@@ -1,78 +1,112 @@
 ﻿using System;
 
-namespace PokemonTownMap
+namespace PokelikeConsole
 {
-    class Program
+    internal sealed class Map
     {
-        static char[,] map = new char[,]
+        private readonly Tile[,] _tiles;
+
+        public int Width { get; }
+        public int Height { get; }
+        public int SpawnX { get; }
+        public int SpawnY { get; }
+
+        public Map(int width, int height, int spawnX, int spawnY)
         {
-            // 0    1    2    3    4    5    6    7    8    9    10   11   12   13   14
-            { '🌳','🌳','🌳','🌳','🌳','🌳','🌳','🌳','🌳','🌳','🌳','🌳','🌳','🌳','🌳' },
-            { '🌳','░','░','░','░','░','░','░','░','░','░','░','░','░','🌳' },
-            { '🌳','🏥','🏥','🏥','░','░','👩','🏠','🏠','🏠','░','░','░','░','🌳' },
-            { '🌳','🏥','🏥','🏥','░','░','░','░','░','░','░','░','░','░','🌳' },
-            { '🌳','░','░','░','░','░','░','░','░','░','░','░','░','░','🌳' },
-            { '🌳','♣','♣','♣','♣','♣','♣','♣','♣','♣','♣','♣','♣','♣','🌳' },
-            { '🌳','🌳','🌳','🌳','🌳','🌳','🌳','🌳','🌳','🌳','🌳','🌳','🌳','🌳','🌳' }
-        };
-
-        static int playerX = 4;
-        static int playerY = 4;
-
-        static void Main(string[] args)
-        {
-            Console.OutputEncoding = System.Text.Encoding.UTF8;
-
-            while (true)
-            {
-                Console.Clear();
-                DrawMap();
-                Console.WriteLine("Move with W/A/S/D | Q to quit");
-                ConsoleKey key = Console.ReadKey(true).Key;
-
-                if (key == ConsoleKey.Q) break;
-
-                MovePlayer(key);
-            }
+            Width = width;
+            Height = height;
+            SpawnX = spawnX;
+            SpawnY = spawnY;
+            _tiles = new Tile[width, height];
         }
 
-        static void DrawMap()
+        public void Set(int x, int y, Tile tile) => _tiles[x, y] = tile;
+
+        public Tile Get(int x, int y) => _tiles[x, y];
+
+        public bool InBounds(int x, int y) => x >= 0 && y >= 0 && x < Width && y < Height;
+    }
+
+    internal static class DemoMaps
+    {
+        // Simple Pallet Town-like layout
+        public static Map BuildPalletTown()
         {
-            for (int y = 0; y < map.GetLength(0); y++)
-            {
-                for (int x = 0; x < map.GetLength(1); x++)
-                {
-                    if (x == playerX && y == playerY)
-                        Console.Write('👾'); // Player
-                    else
-                        Console.Write(map[y, x]);
-                }
-                Console.WriteLine();
-            }
+            int w = 48, h = 24;
+            var map = new Map(w, h, spawnX: 24, spawnY: 14);
+
+            // Fill with grass
+            for (int x = 0; x < w; x++)
+                for (int y = 0; y < h; y++)
+                    map.Set(x, y, Tile.Make(TileType.GrassShort));
+
+            // Ocean at bottom
+            for (int y = 18; y < h; y++)
+                for (int x = 0; x < w; x++)
+                    map.Set(x, y, Tile.Make(TileType.Water));
+
+            // Path through town
+            for (int x = 0; x < w; x++)
+                map.Set(x, 14, Tile.Make(TileType.Path));
+            for (int y = 10; y <= 18; y++)
+                map.Set(24, y, Tile.Make(TileType.Path));
+
+            // Tall grass patches
+            Rect(map, 6, 3, 10, 6, TileType.GrassTall);
+            Rect(map, 32, 4, 10, 6, TileType.GrassTall);
+
+            // Fences
+            HorizontalFence(map, 2, 9, 44);
+            HorizontalFence(map, 2, 19, 44);
+            VerticalFence(map, 2, 9, 10);
+            VerticalFence(map, 46, 9, 10);
+
+            // Houses (2x)
+            House(map, 8, 11);
+            House(map, 34, 11);
+
+            // Signs
+            map.Set(23, 14, Tile.Make(TileType.Sign));
+            map.Set(25, 14, Tile.Make(TileType.Sign));
+
+            return map;
         }
 
-        static void MovePlayer(ConsoleKey key)
+        private static void Rect(Map map, int x, int y, int w, int h, TileType type)
         {
-            int newX = playerX;
-            int newY = playerY;
+            for (int ix = x; ix < x + w; ix++)
+                for (int iy = y; iy < y + h; iy++)
+                    if (map.InBounds(ix, iy))
+                        map.Set(ix, iy, Tile.Make(type));
+        }
 
-            switch (key)
-            {
-                case ConsoleKey.W: newY--; break;
-                case ConsoleKey.S: newY++; break;
-                case ConsoleKey.A: newX--; break;
-                case ConsoleKey.D: newX++; break;
-            }
+        private static void HorizontalFence(Map map, int x, int y, int length)
+        {
+            for (int i = 0; i < length; i++)
+                map.Set(x + i, y, Tile.Make(TileType.Fence));
+        }
 
-            if (newX >= 0 && newX < map.GetLength(1) && newY >= 0 && newY < map.GetLength(0))
-            {
-                char terrain = map[newY, newX];
-                if (terrain != '🌳') // Can't walk into trees
-                {
-                    playerX = newX;
-                    playerY = newY;
-                }
-            }
+        private static void VerticalFence(Map map, int x, int y, int length)
+        {
+            for (int i = 0; i < length; i++)
+                map.Set(x, y + i, Tile.Make(TileType.Fence));
+        }
+
+        private static void House(Map map, int x, int y)
+        {
+            // Outer walls
+            Rect(map, x, y, 10, 6, TileType.HouseWall);
+
+            // Roof line
+            for (int i = 0; i < 10; i++)
+                map.Set(x + i, y, Tile.Make(TileType.HouseRoof));
+
+            // Door
+            map.Set(x + 4, y + 5, Tile.Make(TileType.Door));
+
+            // Windows
+            map.Set(x + 2, y + 2, Tile.Make(TileType.Window));
+            map.Set(x + 7, y + 2, Tile.Make(TileType.Window));
         }
     }
 }
