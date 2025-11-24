@@ -13,7 +13,12 @@ namespace PokelikeConsole
         HouseRoof,
         Door,
         Window,
-        Sign
+        Sign,
+        Mountain,
+        Flower,
+        Tree,
+        Sand,
+        Bridge
     }
 
     internal readonly struct Tile
@@ -64,6 +69,10 @@ namespace PokelikeConsole
                     return new Tile(type, false, 'S', "☗", ConsoleColor.White, ConsoleColor.DarkGray);
                 default:
                     return new Tile(TileType.GrassShort, true, '.', "·", ConsoleColor.Green, ConsoleColor.DarkGreen);
+                case TileType.Flower:
+                    return new Tile(type, false, '*', "✿", ConsoleColor.Magenta, ConsoleColor.Green);
+                case TileType.Tree:
+                    return new Tile(type, false, 'T', "♣", ConsoleColor.DarkGreen, ConsoleColor.Green);
             }
         }
     }

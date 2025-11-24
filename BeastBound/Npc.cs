@@ -19,10 +19,19 @@ namespace PokelikeConsole
             X = x;
             Y = y;
             Dialog = dialog;
+
         }
 
         public void UpdateWander(Map map)
         {
+            if (map == null) return; // prevent crash
+
+            if (_wanderCooldown > 0)
+            {
+                _wanderCooldown--;
+                return;
+            }
+
             if (_wanderCooldown > 0)
             {
                 _wanderCooldown--;

@@ -30,10 +30,10 @@ namespace PokelikeConsole
     internal static class DemoMaps
     {
         // Simple Pallet Town-like layout
-        public static Map BuildPalletTown()
+        public static Map BuildOverworld()
         {
-            int w = 48, h = 24;
-            var map = new Map(w, h, spawnX: 24, spawnY: 14);
+            int w = 160, h = 80;
+            var map = new Map(w, h, spawnX: 80, spawnY: 40);
 
             // Fill with grass
             for (int x = 0; x < w; x++)
@@ -41,36 +41,91 @@ namespace PokelikeConsole
                     map.Set(x, y, Tile.Make(TileType.GrassShort));
 
             // Ocean at bottom
-            for (int y = 18; y < h; y++)
-                for (int x = 0; x < w; x++)
-                    map.Set(x, y, Tile.Make(TileType.Water));
-
-            // Path through town
+            Rect(map, 0, 60, w, 20, TileType.Water);
             for (int x = 0; x < w; x++)
-                map.Set(x, 14, Tile.Make(TileType.Path));
-            for (int y = 10; y <= 18; y++)
-                map.Set(24, y, Tile.Make(TileType.Path));
+                map.Set(x, 59, Tile.Make(TileType.Path)); // shoreline
 
-            // Tall grass patches
-            Rect(map, 6, 3, 10, 6, TileType.GrassTall);
-            Rect(map, 32, 4, 10, 6, TileType.GrassTall);
+            // Town (top-left)
+            Rect(map, 10, 10, 30, 20, TileType.Path);
+            House(map, 12, 12);
+            House(map, 22, 12);
+            House(map, 18, 20);
+            map.Set(20, 10, Tile.Make(TileType.Sign));
 
-            // Fences
-            HorizontalFence(map, 2, 9, 44);
-            HorizontalFence(map, 2, 19, 44);
-            VerticalFence(map, 2, 9, 10);
-            VerticalFence(map, 46, 9, 10);
+            // Forest (top-right)
+            Rect(map, 100, 5, 40, 25, TileType.GrassTall);
+            for (int i = 0; i < 40; i++)
+                map.Set(100 + i, 5 + i % 7, Tile.Make(TileType.Fence));
 
-            // Houses (2x)
-            House(map, 8, 11);
-            House(map, 34, 11);
+            // Route path connecting zones
+            for (int x = 0; x < w; x++)
+                map.Set(x, 40, Tile.Make(TileType.Path));
+            for (int y = 20; y <= 60; y++)
+                map.Set(80, y, Tile.Make(TileType.Path));
 
-            // Signs
-            map.Set(23, 14, Tile.Make(TileType.Sign));
-            map.Set(25, 14, Tile.Make(TileType.Sign));
+            // Cave entrance (bottom-right)
+            Rect(map, 120, 50, 15, 10, TileType.HouseWall);
+            map.Set(127, 55, Tile.Make(TileType.Door));
+            map.Set(126, 54, Tile.Make(TileType.Sign));
+
+            // Decorative tall grass patches
+            Rect(map, 50, 25, 10, 10, TileType.GrassTall);
+            Rect(map, 70, 45, 8, 8, TileType.GrassTall);
+
+            // Route sign
+            map.Set(80, 39, Tile.Make(TileType.Sign));
 
             return map;
         }
+
+        
+        public static Map BuildCave()
+        {
+            int w = 40, h = 20;
+            var map = new Map(w, h, spawnX: 20, spawnY: 10);
+
+            // Fill cave walls
+            for (int x = 0; x < w; x++)
+                for (int y = 0; y < h; y++)
+                    map.Set(x, y, Tile.Make(TileType.HouseWall));
+
+            // Path inside cave
+            Rect(map, 5, 5, 30, 10, TileType.Path);
+
+            // Exit back to overworld
+            map.Set(20, 18, Tile.Make(TileType.Door));
+
+            return map;
+        }
+
+        public static Map BuildHouseInterior()
+        {
+            int w = 20, h = 12;
+            var map = new Map(w, h, spawnX: 10, spawnY: 6);
+
+            // Floor
+            for (int x = 0; x < w; x++)
+                for (int y = 0; y < h; y++)
+                    map.Set(x, y, Tile.Make(TileType.Path));
+
+            // Walls
+            for (int x = 0; x < w; x++)
+            {
+                map.Set(x, 0, Tile.Make(TileType.HouseWall));
+                map.Set(x, h - 1, Tile.Make(TileType.HouseWall));
+            }
+            for (int y = 0; y < h; y++)
+            {
+                map.Set(0, y, Tile.Make(TileType.HouseWall));
+                map.Set(w - 1, y, Tile.Make(TileType.HouseWall));
+            }
+
+            // Exit door
+            map.Set(10, h - 1, Tile.Make(TileType.Door));
+
+            return map;
+        }
+
 
         private static void Rect(Map map, int x, int y, int w, int h, TileType type)
         {

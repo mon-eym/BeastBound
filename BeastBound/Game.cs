@@ -5,8 +5,7 @@ namespace PokelikeConsole
 {
     internal sealed class Game : IDisposable
     {
-        private readonly Map _map;
-        private readonly Player _player;
+        private readonly World _world;
         private readonly Renderer _renderer;
         private readonly Input _input;
         private readonly Npc[] _npcs;
@@ -16,15 +15,21 @@ namespace PokelikeConsole
 
         public Game()
         {
-            _map = DemoMaps.BuildPalletTown();
-            _player = new Player(_map.SpawnX, _map.SpawnY);
-            _renderer = new Renderer(viewWidth: 32, viewHeight: 18, useAsciiOnly: false);
+            _world = new World();
+            _renderer = new Renderer(Console.WindowWidth, Console.WindowHeight - 3, useAsciiOnly: false);
             _input = new Input();
 
             _npcs = new[]
             {
-                new Npc("Youngster", 13, 9, "I like shorts! They're comfy and easy to wear."),
-                new Npc("Professor", 6, 6, "Technology is incredible!")
+                new Npc("Youngster", 15, 15, "I like shorts!"),
+                new Npc("Professor", 20, 12, "Technology is incredible!"),
+                new Npc("Swimmer", 30, 65, "The water is so refreshing!"),
+                new Npc("Hiker", 125, 55, "Caves are full of mystery."),
+                new Npc("Bug Catcher", 110, 15, "I saw a rare Caterpie!"),
+                new Npc("Lass", 18, 22, "Do you like cute Pokémon?"),
+                new Npc("Fisherman", 40, 70, "The ocean hides many secrets."),
+                new Npc("Guard", 126, 54, "Only trainers with a badge may enter."),
+                new Npc("Old Man", 80, 39, "Route 1 leads to Viridian City.")
             };
         }
 
@@ -36,17 +41,13 @@ namespace PokelikeConsole
             {
                 var frameStart = DateTime.UtcNow;
 
-                // Input
                 HandleInput();
 
-                // Update
                 foreach (var npc in _npcs)
-                    npc.UpdateWander(_map);
+                    npc.UpdateWander(_world.CurrentMap);
 
-                // Render
-                _renderer.Draw(_map, _player, _npcs);
+                _renderer.Draw(_world.CurrentMap, _world.Player, _npcs);
 
-                // Frame pacing
                 var elapsed = DateTime.UtcNow - frameStart;
                 var sleep = frameDuration - elapsed;
                 if (sleep.TotalMilliseconds > 0) Thread.Sleep(sleep);
@@ -89,48 +90,61 @@ namespace PokelikeConsole
 
         private void TryMove(int dx, int dy)
         {
-            var nx = _player.X + dx;
-            var ny = _player.Y + dy;
+            var map = _world.CurrentMap;
+            var player = _world.Player;
 
-            if (!_map.InBounds(nx, ny)) return;
+            var nx = player.X + dx;
+            var ny = player.Y + dy;
 
-            var tile = _map.Get(nx, ny);
-            if (!tile.IsWalkable) return;
+            if (!map.InBounds(nx, ny)) return;
 
-            // Simple movement penalty on tall grass
-            if (tile.Type == TileType.GrassTall)
-                _player.StepDelayTicks = 1;
-            else
-                _player.StepDelayTicks = 0;
+            var tile = map.Get(nx, ny);
+            if (!tile.IsWalkable)
+            {
+                // Handle map transitions
+                if (tile.Type == TileType.Door)
+                {
+                    if (_world.CurrentMapName == "Overworld" && nx > 120)
+                        _world.SwitchMap("Cave", 20, 10);
+                    else if (_world.CurrentMapName == "Overworld" && nx < 30)
+                        _world.SwitchMap("House1", 10, 6);
+                    else if (_world.CurrentMapName == "Cave")
+                        _world.SwitchMap("Overworld", 127, 55);
+                    else if (_world.CurrentMapName == "House1")
+                        _world.SwitchMap("Overworld", 12, 22);
+                }
+                return;
+            }
 
-            // Smooth step limiter
-            if (!_player.CanStep()) return;
+            player.StepDelayTicks = tile.Type == TileType.GrassTall ? 1 : 0;
+            if (!player.CanStep()) return;
 
-            // Avoid walking through NPCs
             foreach (var npc in _npcs)
                 if (npc.X == nx && npc.Y == ny)
                     return;
 
-            _player.MoveTo(nx, ny);
+            player.MoveTo(nx, ny);
         }
 
         private void Interact()
         {
-            // Interact with adjacent NPC
+            var map = _world.CurrentMap;
+            var player = _world.Player;
+
             foreach (var npc in _npcs)
             {
-                if (Math.Abs(npc.X - _player.X) + Math.Abs(npc.Y - _player.Y) == 1)
+                if (Math.Abs(npc.X - player.X) + Math.Abs(npc.Y - player.Y) == 1)
                 {
                     _renderer.ShowDialog($"{npc.Name}: {npc.Dialog}");
                     return;
                 }
             }
 
-            var tile = _map.Get(_player.X, _player.Y);
+            var tile = map.Get(player.X, player.Y);
             switch (tile.Type)
             {
                 case TileType.Sign:
-                    _renderer.ShowDialog("Sign: Welcome to Pallet Town!");
+                    _renderer.ShowDialog("Sign: Welcome to BeastBound!");
                     break;
                 case TileType.Door:
                     _renderer.ShowDialog("The door is locked.");
