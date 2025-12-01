@@ -4,7 +4,9 @@ namespace PokelikeConsole
 {
     internal sealed class World
     {
-        private readonly Dictionary<string, Map> _maps = new();
+        private readonly Dictionary<string, Map> _maps = new Dictionary<string, Map>();
+        // ...
+
 
         public string CurrentMapName { get; private set; }
         public Map CurrentMap => _maps[CurrentMapName];

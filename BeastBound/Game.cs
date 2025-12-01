@@ -20,21 +20,18 @@ namespace PokelikeConsole
             _input = new Input();
 
             _npcs = new[]
-{
-    // Overworld NPCs
-    new Npc("Youngster", 75, 38, "The hub makes it easy to get around!"),
-    new Npc("Professor", 80, 32, "The town is just above the hub."),
-    new Npc("Fisherman", 80, 68, "The beach is my favorite spot."),
-    new Npc("Hiker", 125, 38, "The cave ahead gets tougher!"),
+            {
+                // Overworld NPCs (coordinates are in the Overworld map)
+                new Npc("Youngster", 75, 38, "The hub makes it easy to get around!"),
+                new Npc("Professor", 80, 32, "The town is just above the hub."),
+                new Npc("Fisherman", 80, 68, "The beach is my favorite spot."),
+                new Npc("Hiker", 125, 38, "The cave ahead gets tougher!"),
 
-    // Battle House NPCs (inside BattleHouse map coordinates)
-    // Easy battle trainer
-    new Npc("Lass", 6, 6, "Welcome to the Battle House! Try the easy battle first."),
-    // Medium battle trainer
-    new Npc("Ace Trainer", 15, 6, "Think you're ready for a real challenge?"),
-    // Hard battle trainer
-    new Npc("Champion", 24, 6, "Only the strongest can defeat me.")
-};
+                // Battle House NPCs (BattleHouse map coordinates)
+                new Npc("Lass",       6,  6, "Welcome to the Battle House! Try the easy battle first."),
+                new Npc("Ace Trainer",15, 6, "Think you're ready for a real challenge?"),
+                new Npc("Champion",   24, 6, "Only the strongest can defeat me.")
+            };
         }
 
         public void Run()
@@ -103,43 +100,53 @@ namespace PokelikeConsole
             if (!map.InBounds(nx, ny)) return;
 
             var tile = map.Get(nx, ny);
+
+            // Handle doors first (non-walkable)
             if (!tile.IsWalkable)
             {
-                // Door transitions
-                if (tile.Type == TileType.Door)
+                if (tile.Type == TileType.DoorClosed || tile.Type == TileType.DoorOpen || tile.Type == TileType.DoorLocked)
                 {
                     if (_world.CurrentMapName == "Overworld")
                     {
-                        // Cave entrance door
+                        // Cave entrance door (in the cave room)
                         if (nx == 125 && ny == 38)
+                        {
                             _world.SwitchMap("Cave", 20, 10);
-
-                        // Battle House door (overworld position 78,47 from earlier)
-                        else if (nx == 78 && ny == 47)
+                        }
+                        // Battle House door (near center)
+                        else if (nx == 80 && ny == 53)
+                        {
                             _world.SwitchMap("BattleHouse", 15, 14);
-
-                        // Other house entries if you want
+                        }
+                        // You can add more building doors here later
                     }
                     else if (_world.CurrentMapName == "Cave")
                     {
-                        _world.SwitchMap("Overworld", 125, 39); // exit cave near entrance
+                        // Exit cave back to overworld
+                        _world.SwitchMap("Overworld", 125, 39);
                     }
                     else if (_world.CurrentMapName == "BattleHouse")
                     {
-                        // Exit back to overworld from BattleHouse bottom door
-                        _world.SwitchMap("Overworld", 78, 48);
+                        // Exit Battle House back to overworld (door at bottom center of BattleHouse map)
+                        _world.SwitchMap("Overworld", 80, 54);
                     }
 
                     return;
                 }
 
+                // Other non-walkable tiles: just block movement
                 return;
             }
 
-            // Walkable tile: handle movement penalties etc.
-            player.StepDelayTicks = tile.Type == TileType.GrassTall ? 1 : 0;
+            // Walkable tile: handle step delay based on grass
+            if (tile.Type == TileType.GrassLight || tile.Type == TileType.GrassMedium)
+                player.StepDelayTicks = 1;
+            else
+                player.StepDelayTicks = 0;
+
             if (!player.CanStep()) return;
 
+            // Avoid colliding with NPCs
             foreach (var npc in _npcs)
                 if (npc.X == nx && npc.Y == ny)
                     return;
@@ -149,43 +156,14 @@ namespace PokelikeConsole
 
         private void Interact()
         {
-
-
             var map = _world.CurrentMap;
             var player = _world.Player;
-            var playerMon = new Pokemon
-            {
-                Name = "TrucVert",
-                Level = 50,
-                HP = 61,
-                MaxHP = 61,
-                Moves = new[] {
-    new Move { Name = "Headbutt", Power = 20 },
-    new Move { Name = "Flash", Power = 0 },
-    new Move { Name = "Mud-Slap", Power = 15 },
-    new Move { Name = "Tackle", Power = 10 }
-}
-            };
 
-            var enemyMon = new Pokemon
-            {
-                Name = "Mr-Mime",
-                Level = 50,
-                HP = 56,
-                MaxHP = 56,
-                Moves = new[] {
-    new Move { Name = "Pound", Power = 18 }
-}
-            };
-
-            var battle = new BattleEngine(playerMon, enemyMon, _renderer);
-            battle.StartBattle();
             // Check NPCs adjacent
             foreach (var npc in _npcs)
             {
                 if (Math.Abs(npc.X - player.X) + Math.Abs(npc.Y - player.Y) == 1)
                 {
-                    // If we are inside BattleHouse, treat some NPCs as battle trainers
                     if (_world.CurrentMapName == "BattleHouse")
                     {
                         HandleBattleHouseInteraction(npc);
@@ -203,14 +181,22 @@ namespace PokelikeConsole
             {
                 case TileType.Sign:
                     if (_world.CurrentMapName == "Overworld")
+                    {
+                        // You can refine this by coordinates later
                         _renderer.ShowDialog("Sign: Welcome to the BeastBound Hub!");
+                    }
                     else if (_world.CurrentMapName == "BattleHouse")
+                    {
                         _renderer.ShowDialog("Sign: Choose your opponent: Easy, Medium, Hard.");
+                    }
                     else
+                    {
                         _renderer.ShowDialog("It's a weathered sign.");
+                    }
                     break;
 
-                case TileType.Door:
+                case TileType.DoorClosed:
+                case TileType.DoorLocked:
                     _renderer.ShowDialog("The door is locked.");
                     break;
 
@@ -222,27 +208,95 @@ namespace PokelikeConsole
 
         private void HandleBattleHouseInteraction(Npc npc)
         {
+            // Prepare a simple starter Pokémon for now
+            var playerMon = new Pokemon
+            {
+                Name = "TrucVert",
+                Level = 50,
+                HP = 61,
+                MaxHP = 61,
+                Moves = new[]
+                {
+                    new Move { Name = "Headbutt", Power = 20 },
+                    new Move { Name = "Flash",    Power = 0  },
+                    new Move { Name = "Mud-Slap", Power = 15 },
+                    new Move { Name = "Tackle",   Power = 10 }
+                }
+            };
+
+            Pokemon enemyMon;
+            string intro;
+            string winMessage;
+
             if (npc.Name == "Lass")
             {
                 // Easy battle
-                _renderer.ShowDialog("Lass: Let's have an easy warm-up battle!");
-                _renderer.ShowDialog("You win! That was the easy battle.");
+                enemyMon = new Pokemon
+                {
+                    Name = "Pidgey",
+                    Level = 10,
+                    HP = 30,
+                    MaxHP = 30,
+                    Moves = new[]
+                    {
+                        new Move { Name = "Gust", Power = 10 }
+                    }
+                };
+                intro = "Lass: Let's have an easy warm-up battle!";
+                winMessage = "You win! That was the easy battle.";
             }
             else if (npc.Name == "Ace Trainer")
             {
                 // Medium battle
-                _renderer.ShowDialog("Ace Trainer: I'll test your real strength!");
-                _renderer.ShowDialog("That was tough, but you won the medium battle!");
+                enemyMon = new Pokemon
+                {
+                    Name = "Growlithe",
+                    Level = 25,
+                    HP = 50,
+                    MaxHP = 50,
+                    Moves = new[]
+                    {
+                        new Move { Name = "Ember", Power = 15 }
+                    }
+                };
+                intro = "Ace Trainer: I'll test your real strength!";
+                winMessage = "That was tough, but you won the medium battle!";
             }
             else if (npc.Name == "Champion")
             {
                 // Hard battle
-                _renderer.ShowDialog("Champion: Only true champions can win this.");
-                _renderer.ShowDialog("Incredible! You defeated the Champion in the hard battle!");
+                enemyMon = new Pokemon
+                {
+                    Name = "Mr-Mime",
+                    Level = 50,
+                    HP = 56,
+                    MaxHP = 56,
+                    Moves = new[]
+                    {
+                        new Move { Name = "Psybeam", Power = 20 }
+                    }
+                };
+                intro = "Champion: Only true champions can win this.";
+                winMessage = "Incredible! You defeated the Champion in the hard battle!";
             }
             else
             {
                 _renderer.ShowDialog($"{npc.Name}: Welcome to the Battle House.");
+                return;
+            }
+
+            _renderer.ShowDialog(intro);
+
+            var battle = new BattleEngine(playerMon, enemyMon, _renderer);
+            battle.StartBattle();
+
+            if (playerMon.HP > 0)
+            {
+                _renderer.ShowDialog(winMessage);
+            }
+            else
+            {
+                _renderer.ShowDialog("You were defeated... but you can always try again.");
             }
         }
 
