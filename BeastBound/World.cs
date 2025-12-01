@@ -4,19 +4,18 @@ namespace PokelikeConsole
 {
     internal sealed class World
     {
-        private readonly Dictionary<string, Map> _maps = new Dictionary<string, Map>();
+        private readonly Dictionary<string, Map> _maps = new();
+
         public string CurrentMapName { get; private set; }
         public Map CurrentMap => _maps[CurrentMapName];
-
         public Player Player { get; }
 
         public World()
         {
-            // Register maps
             _maps["Overworld"] = DemoMaps.BuildOverworld();
+            _maps["BattleHouse"] = DemoMaps.BuildBattleHouse();
             _maps["Cave"] = DemoMaps.BuildCave();
             _maps["House1"] = DemoMaps.BuildHouseInterior();
-            _maps["BattleHouse"] = DemoMaps.BuildBattleHouse();
 
             CurrentMapName = "Overworld";
             var spawn = CurrentMap;

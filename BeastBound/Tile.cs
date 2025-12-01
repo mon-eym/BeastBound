@@ -4,21 +4,18 @@ namespace PokelikeConsole
 {
     internal enum TileType
     {
-        GrassShort,
-        GrassTall,
-        Path,
-        Fence,
-        Water,
-        HouseWall,
-        HouseRoof,
-        Door,
-        Window,
+        Floor,
+        Wall,
+        DoorClosed,
+        DoorOpen,
+        DoorLocked,
         Sign,
-        Mountain,
-        Flower,
-        Tree,
-        Sand,
-        Bridge
+        GrassLight,
+        GrassMedium,
+        GrassHeavy,
+        Water,
+        Player,
+        NPC
     }
 
     internal readonly struct Tile
@@ -36,7 +33,7 @@ namespace PokelikeConsole
             ConsoleColor fg, ConsoleColor bg)
         {
             Type = type;
-1            IsWalkable = isWalkable;
+            IsWalkable = isWalkable;
             GlyphAscii = glyphAscii;
             GlyphUnicode = glyphUnicode;
             Foreground = fg;
@@ -47,32 +44,44 @@ namespace PokelikeConsole
         {
             switch (type)
             {
-                case TileType.GrassShort:
-                    return new Tile(type, true, '.', "·", ConsoleColor.Green, ConsoleColor.DarkGreen);
-                case TileType.GrassTall:
-                    return new Tile(type, true, '"', "❈", ConsoleColor.Green, ConsoleColor.DarkGreen);
-                case TileType.Path:
-                    return new Tile(type, true, '#', "▓", ConsoleColor.Yellow, ConsoleColor.DarkYellow);
-                case TileType.Fence:
-                    return new Tile(type, false, '+', "┼", ConsoleColor.White, ConsoleColor.DarkGray);
-                case TileType.Water:
-                    return new Tile(type, false, '~', "≈", ConsoleColor.Cyan, ConsoleColor.DarkBlue);
-                case TileType.HouseWall:
-                    return new Tile(type, false, 'H', "█", ConsoleColor.Gray, ConsoleColor.DarkGray);
-                case TileType.HouseRoof:
-                    return new Tile(type, false, '^', "▀", ConsoleColor.Red, ConsoleColor.DarkRed);
-                case TileType.Door:
-                    return new Tile(type, false, 'D', "▛", ConsoleColor.DarkYellow, ConsoleColor.Black);
-                case TileType.Window:
-                    return new Tile(type, false, 'O', "□", ConsoleColor.White, ConsoleColor.DarkGray);
+                case TileType.Floor:
+                    return new Tile(type, true, '.', "·", ConsoleColor.Gray, ConsoleColor.Black);
+
+                case TileType.Wall:
+                    return new Tile(type, false, '#', "█", ConsoleColor.White, ConsoleColor.Black);
+
+                case TileType.DoorClosed:
+                    return new Tile(type, false, '+', "╬", ConsoleColor.Yellow, ConsoleColor.Black);
+
+                case TileType.DoorOpen:
+                    return new Tile(type, true, '/', "╫", ConsoleColor.Green, ConsoleColor.Black);
+
+                case TileType.DoorLocked:
+                    return new Tile(type, false, 'X', "╪", ConsoleColor.Red, ConsoleColor.Black);
+
                 case TileType.Sign:
-                    return new Tile(type, false, 'S', "☗", ConsoleColor.White, ConsoleColor.DarkGray);
+                    return new Tile(type, false, '?', "?", ConsoleColor.Cyan, ConsoleColor.Black);
+
+                case TileType.GrassLight:
+                    return new Tile(type, true, ',', "░", ConsoleColor.Green, ConsoleColor.Black);
+
+                case TileType.GrassMedium:
+                    return new Tile(type, true, ';', "▒", ConsoleColor.DarkGreen, ConsoleColor.Black);
+
+                case TileType.GrassHeavy:
+                    return new Tile(type, false, '#', "▓", ConsoleColor.DarkGray, ConsoleColor.Black);
+
+                case TileType.Water:
+                    return new Tile(type, false, '~', "≈", ConsoleColor.Blue, ConsoleColor.Black);
+
+                case TileType.Player:
+                    return new Tile(type, true, '@', "@", ConsoleColor.White, ConsoleColor.Black);
+
+                case TileType.NPC:
+                    return new Tile(type, true, 'N', "☺", ConsoleColor.Magenta, ConsoleColor.Black);
+
                 default:
-                    return new Tile(TileType.GrassShort, true, '.', "·", ConsoleColor.Green, ConsoleColor.DarkGreen);
-                case TileType.Flower:
-                    return new Tile(type, false, '*', "✿", ConsoleColor.Magenta, ConsoleColor.Green);
-                case TileType.Tree:
-                    return new Tile(type, false, 'T', "♣", ConsoleColor.DarkGreen, ConsoleColor.Green);
+                    return new Tile(TileType.Floor, true, '.', "·", ConsoleColor.Gray, ConsoleColor.Black);
             }
         }
     }

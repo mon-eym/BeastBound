@@ -4,21 +4,32 @@ namespace PokelikeConsole
 {
     internal sealed class Map
     {
-        private readonly Tile[,] _tiles;
-
-        public int Width { get; }
-        public int Height { get; }
-        public int SpawnX { get; }
-        public int SpawnY { get; }
-
-        public Map(int width, int height, int spawnX, int spawnY)
+        internal sealed class Map
         {
-            Width = width;
-            Height = height;
-            SpawnX = spawnX;
-            SpawnY = spawnY;
-            _tiles = new Tile[width, height];
+            private readonly Tile[,] _tiles;
+
+            public int Width { get; }
+            public int Height { get; }
+            public int SpawnX { get; }
+            public int SpawnY { get; }
+
+            public Map(int width, int height, int spawnX, int spawnY)
+            {
+                Width = width;
+                Height = height;
+                SpawnX = spawnX;
+                SpawnY = spawnY;
+                _tiles = new Tile[width, height];
+            }
+
+            public void Set(int x, int y, Tile tile) => _tiles[x, y] = tile;
+
+            public Tile Get(int x, int y) => _tiles[x, y];
+
+            public bool InBounds(int x, int y) => x >= 0 && y >= 0 && x < Width && y < Height;
         }
+}
+
 
         public void Set(int x, int y, Tile tile) => _tiles[x, y] = tile;
 
@@ -27,9 +38,15 @@ namespace PokelikeConsole
         public bool InBounds(int x, int y) => x >= 0 && y >= 0 && x < Width && y < Height;
     }
 
+    using System;
+
+namespace PokelikeConsole
+{
     internal static class DemoMaps
     {
-        // Simple Pallet Town-like layout
+        // ============================================================
+        //  OVERWORLD (160x80, maze-style hub)
+        // ============================================================
         public static Map BuildOverworld()
         {
             int w = 160, h = 80;
@@ -40,7 +57,7 @@ namespace PokelikeConsole
                 for (int y = 0; y < h; y++)
                     map.Set(x, y, Tile.Make(TileType.Floor));
 
-            // CENTRAL HUB CROSS (like your maze screenshot)
+            // CENTRAL HUB CROSS
             for (int x = 0; x < w; x++)
                 map.Set(x, 40, Tile.Make(TileType.Floor));
 
@@ -51,8 +68,6 @@ namespace PokelikeConsole
             // TOP ROOM — TOWN
             // ============================
             Rect(map, 60, 10, 40, 20, TileType.Floor);
-
-            // Town walls
             Box(map, 60, 10, 40, 20, TileType.Wall);
 
             // Houses (simple clean rooms)
@@ -107,7 +122,7 @@ namespace PokelikeConsole
             Rect(map, 110, 30, 30, 20, TileType.GrassMedium);
             Box(map, 110, 30, 30, 20, TileType.Wall);
 
-            // Cave entrance
+            // Cave entrance (small building)
             Box(map, 120, 35, 10, 6, TileType.Wall);
             map.Set(125, 38, Tile.Make(TileType.DoorClosed));
             map.Set(124, 37, Tile.Make(TileType.Sign));
@@ -119,13 +134,16 @@ namespace PokelikeConsole
             // ============================
             // BATTLE HOUSE (near center)
             // ============================
-            // BATTLE HOUSE (near center)
             Box(map, 72, 44, 16, 10, TileType.Wall);
             map.Set(80, 53, Tile.Make(TileType.DoorClosed));
-            map.Set(80, 54, Tile.Make(TileType.Sign)); // Battle House sign
+            map.Set(80, 54, Tile.Make(TileType.Sign)); // "Battle House"
 
             return map;
         }
+
+        // ============================================================
+        //  BATTLE HOUSE INTERIOR
+        // ============================================================
         public static Map BuildBattleHouse()
         {
             int w = 30, h = 18;
@@ -139,49 +157,52 @@ namespace PokelikeConsole
             // Outer walls
             Box(map, 0, 0, w, h, TileType.Wall);
 
-            // Exit door
+            // Exit door (bottom center)
             map.Set(w / 2, h - 1, Tile.Make(TileType.DoorOpen));
 
             // EASY trainer room
             Box(map, 2, 2, 8, 6, TileType.Wall);
             map.Set(6, 5, Tile.Make(TileType.NPC));
+            map.Set(6, 9, Tile.Make(TileType.Sign));  // Easy sign
 
             // MEDIUM trainer room
             Box(map, 11, 2, 8, 6, TileType.Wall);
             map.Set(15, 5, Tile.Make(TileType.NPC));
+            map.Set(15, 9, Tile.Make(TileType.Sign)); // Medium sign
 
             // HARD trainer room
             Box(map, 20, 2, 8, 6, TileType.Wall);
             map.Set(24, 5, Tile.Make(TileType.NPC));
-
-            // Signs under each room
-            map.Set(6, 9, Tile.Make(TileType.Sign));  // Easy
-            map.Set(15, 9, Tile.Make(TileType.Sign)); // Medium
-            map.Set(24, 9, Tile.Make(TileType.Sign)); // Hard
+            map.Set(24, 9, Tile.Make(TileType.Sign)); // Hard sign
 
             return map;
         }
 
-
+        // ============================================================
+        //  SIMPLE CAVE (using new tileset)
+        // ============================================================
         public static Map BuildCave()
         {
             int w = 40, h = 20;
             var map = new Map(w, h, spawnX: 20, spawnY: 10);
 
-            // Fill cave walls
+            // Fill with solid walls (rock)
             for (int x = 0; x < w; x++)
                 for (int y = 0; y < h; y++)
-                    map.Set(x, y, Tile.Make(TileType.HouseWall));
+                    map.Set(x, y, Tile.Make(TileType.Wall));
 
-            // Path inside cave
-            Rect(map, 5, 5, 30, 10, TileType.Path);
+            // Carve a floor area inside
+            Rect(map, 3, 3, 34, 14, TileType.Floor);
 
-            // Exit back to overworld
-            map.Set(20, 18, Tile.Make(TileType.Door));
+            // Exit back to overworld (bottom middle of the room)
+            map.Set(20, 17, Tile.Make(TileType.DoorOpen));
 
             return map;
         }
 
+        // ============================================================
+        //  SIMPLE HOUSE INTERIOR (using new tileset)
+        // ============================================================
         public static Map BuildHouseInterior()
         {
             int w = 20, h = 12;
@@ -190,27 +211,20 @@ namespace PokelikeConsole
             // Floor
             for (int x = 0; x < w; x++)
                 for (int y = 0; y < h; y++)
-                    map.Set(x, y, Tile.Make(TileType.Path));
+                    map.Set(x, y, Tile.Make(TileType.Floor));
 
             // Walls
-            for (int x = 0; x < w; x++)
-            {
-                map.Set(x, 0, Tile.Make(TileType.HouseWall));
-                map.Set(x, h - 1, Tile.Make(TileType.HouseWall));
-            }
-            for (int y = 0; y < h; y++)
-            {
-                map.Set(0, y, Tile.Make(TileType.HouseWall));
-                map.Set(w - 1, y, Tile.Make(TileType.HouseWall));
-            }
+            Box(map, 0, 0, w, h, TileType.Wall);
 
-            // Exit door
-            map.Set(10, h - 1, Tile.Make(TileType.Door));
+            // Exit door at bottom center
+            map.Set(w / 2, h - 1, Tile.Make(TileType.DoorOpen));
 
             return map;
         }
 
-
+        // ============================================================
+        //  HELPERS (Rect + Box)
+        // ============================================================
         private static void Rect(Map map, int x, int y, int w, int h, TileType type)
         {
             for (int ix = x; ix < x + w; ix++)
@@ -219,33 +233,28 @@ namespace PokelikeConsole
                         map.Set(ix, iy, Tile.Make(type));
         }
 
-        private static void HorizontalFence(Map map, int x, int y, int length)
+        private static void Box(Map map, int x, int y, int w, int h, TileType type)
         {
-            for (int i = 0; i < length; i++)
-                map.Set(x + i, y, Tile.Make(TileType.Fence));
+            // Top and bottom
+            for (int ix = x; ix < x + w; ix++)
+            {
+                if (map.InBounds(ix, y))
+                    map.Set(ix, y, Tile.Make(type));
+                if (map.InBounds(ix, y + h - 1))
+                    map.Set(ix, y + h - 1, Tile.Make(type));
+            }
+
+            // Left and right
+            for (int iy = y; iy < y + h; iy++)
+            {
+                if (map.InBounds(x, iy))
+                    map.Set(x, iy, Tile.Make(type));
+                if (map.InBounds(x + w - 1, iy))
+                    map.Set(x + w - 1, iy, Tile.Make(type));
+            }
         }
-
-        private static void VerticalFence(Map map, int x, int y, int length)
-        {
-            for (int i = 0; i < length; i++)
-                map.Set(x, y + i, Tile.Make(TileType.Fence));
-        }
-
-        private static void House(Map map, int x, int y)
-        {
-            // Outer walls
-            Rect(map, x, y, 10, 6, TileType.HouseWall);
-
-            // Roof line
-            for (int i = 0; i < 10; i++)
-                map.Set(x + i, y, Tile.Make(TileType.HouseRoof));
-
-            // Door
-            map.Set(x + 4, y + 5, Tile.Make(TileType.Door));
-
-            // Windows
-            map.Set(x + 2, y + 2, Tile.Make(TileType.Window));
-            map.Set(x + 7, y + 2, Tile.Make(TileType.Window));
+    }
+}
         }
     }
 }

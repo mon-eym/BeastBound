@@ -149,9 +149,37 @@ namespace PokelikeConsole
 
         private void Interact()
         {
+
+
             var map = _world.CurrentMap;
             var player = _world.Player;
+            var playerMon = new Pokemon
+            {
+                Name = "TrucVert",
+                Level = 50,
+                HP = 61,
+                MaxHP = 61,
+                Moves = new[] {
+    new Move { Name = "Headbutt", Power = 20 },
+    new Move { Name = "Flash", Power = 0 },
+    new Move { Name = "Mud-Slap", Power = 15 },
+    new Move { Name = "Tackle", Power = 10 }
+}
+            };
 
+            var enemyMon = new Pokemon
+            {
+                Name = "Mr-Mime",
+                Level = 50,
+                HP = 56,
+                MaxHP = 56,
+                Moves = new[] {
+    new Move { Name = "Pound", Power = 18 }
+}
+            };
+
+            var battle = new BattleEngine(playerMon, enemyMon, _renderer);
+            battle.StartBattle();
             // Check NPCs adjacent
             foreach (var npc in _npcs)
             {
