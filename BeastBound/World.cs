@@ -16,6 +16,7 @@ namespace PokelikeConsole
             _maps["Overworld"] = DemoMaps.BuildOverworld();
             _maps["Cave"] = DemoMaps.BuildCave();
             _maps["House1"] = DemoMaps.BuildHouseInterior();
+            _maps["BattleHouse"] = DemoMaps.BuildBattleHouse();
 
             CurrentMapName = "Overworld";
             var spawn = CurrentMap;

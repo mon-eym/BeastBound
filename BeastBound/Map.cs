@@ -35,50 +35,125 @@ namespace PokelikeConsole
             int w = 160, h = 80;
             var map = new Map(w, h, spawnX: 80, spawnY: 40);
 
-            // Fill with grass
+            // Base: short grass everywhere
             for (int x = 0; x < w; x++)
                 for (int y = 0; y < h; y++)
                     map.Set(x, y, Tile.Make(TileType.GrassShort));
 
-            // Ocean at bottom
-            Rect(map, 0, 60, w, 20, TileType.Water);
+            // Central cross paths (hub like your screenshot)
             for (int x = 0; x < w; x++)
-                map.Set(x, 59, Tile.Make(TileType.Path)); // shoreline
+                map.Set(x, 40, Tile.Make(TileType.Path)); // horizontal
+            for (int y = 0; y < h; y++)
+                map.Set(80, y, Tile.Make(TileType.Path)); // vertical
 
-            // Town (top-left)
-            Rect(map, 10, 10, 30, 20, TileType.Path);
-            House(map, 12, 12);
-            House(map, 22, 12);
-            House(map, 18, 20);
-            map.Set(20, 10, Tile.Make(TileType.Sign));
+            // --- Top "Town" room (above the cross) ---
+            // Town plaza area
+            Rect(map, 60, 10, 40, 20, TileType.Path);
 
-            // Forest (top-right)
-            Rect(map, 100, 5, 40, 25, TileType.GrassTall);
-            for (int i = 0; i < 40; i++)
-                map.Set(100 + i, 5 + i % 7, Tile.Make(TileType.Fence));
+            // Two houses
+            House(map, 66, 14); // left house
+            House(map, 86, 14); // right house
 
-            // Route path connecting zones
-            for (int x = 0; x < w; x++)
-                map.Set(x, 40, Tile.Make(TileType.Path));
-            for (int y = 20; y <= 60; y++)
+            // Fence border for town
+            HorizontalFence(map, 60, 10, 40);
+            HorizontalFence(map, 60, 30, 40);
+            VerticalFence(map, 60, 10, 20);
+            VerticalFence(map, 100, 10, 20);
+
+            // Town sign at bottom of town area
+            map.Set(80, 31, Tile.Make(TileType.Sign));
+
+            // Path connecting town to hub
+            for (int y = 31; y <= 39; y++)
                 map.Set(80, y, Tile.Make(TileType.Path));
 
-            // Cave entrance (bottom-right)
-            Rect(map, 120, 50, 15, 10, TileType.HouseWall);
-            map.Set(127, 55, Tile.Make(TileType.Door));
-            map.Set(126, 54, Tile.Make(TileType.Sign));
+            // --- Left "Forest" room ---
+            Rect(map, 10, 30, 40, 20, TileType.GrassTall);
+            // A simple maze-ish fence inside forest
+            for (int x = 14; x < 46; x += 4)
+                for (int y = 32; y < 48; y += 2)
+                    map.Set(x, y, Tile.Make(TileType.Fence));
 
-            // Decorative tall grass patches
-            Rect(map, 50, 25, 10, 10, TileType.GrassTall);
-            Rect(map, 70, 45, 8, 8, TileType.GrassTall);
+            // Path from hub to forest
+            for (int x = 40; x <= 79; x++)
+                map.Set(x, 40, Tile.Make(TileType.Path));
 
-            // Route sign
-            map.Set(80, 39, Tile.Make(TileType.Sign));
+            map.Set(39, 40, Tile.Make(TileType.Sign)); // "Forest" sign
+
+            // --- Bottom "Beach" room ---
+            Rect(map, 50, 55, 60, 15, TileType.Sand); // you can define Sand as a tile, or use Path/Grass
+            Rect(map, 50, 70, 60, 10, TileType.Water);
+
+            // Pier/path to water
+            for (int y = 55; y <= 69; y++)
+                map.Set(80, y, Tile.Make(TileType.Path));
+
+            map.Set(80, 54, Tile.Make(TileType.Sign)); // "Beach" sign
+
+            // --- Right "Cave" area ---
+            Rect(map, 110, 30, 30, 20, TileType.GrassShort);
+            // Rocky border using HouseWall as rock
+            HorizontalWall(map, 110, 30, 30);
+            HorizontalWall(map, 110, 49, 30);
+            VerticalWall(map, 110, 30, 20);
+            VerticalWall(map, 139, 30, 20);
+
+            // Cave entrance (door) on the inner side
+            Rect(map, 120, 35, 10, 6, TileType.HouseWall);
+            map.Set(125, 38, Tile.Make(TileType.Door));
+            map.Set(124, 37, Tile.Make(TileType.Sign)); // "Cave" sign
+
+            // Path from hub to cave
+            for (int x = 81; x <= 119; x++)
+                map.Set(x, 40, Tile.Make(TileType.Path));
+
+            // --- Battle House near center (interactive) ---
+            // Place a special house south of the hub center
+            House(map, 76, 44); // centered around x ~78
+                                // Replace its door tile with a special BattleHouse door
+                                // Assuming the default House places a door at (houseX+2, houseY+3)
+            map.Set(78, 47, Tile.Make(TileType.Door));
+            map.Set(78, 48, Tile.Make(TileType.Sign)); // "Battle House" sign
+
+            return map;
+        }
+        public static Map BuildBattleHouse()
+        {
+            int w = 30, h = 18;
+            var map = new Map(w, h, spawnX: 15, spawnY: 14);
+
+            // Floor
+            for (int x = 0; x < w; x++)
+                for (int y = 0; y < h; y++)
+                    map.Set(x, y, Tile.Make(TileType.Path));
+
+            // Walls around
+            for (int x = 0; x < w; x++)
+            {
+                map.Set(x, 0, Tile.Make(TileType.HouseWall));
+                map.Set(x, h - 1, Tile.Make(TileType.HouseWall));
+            }
+            for (int y = 0; y < h; y++)
+            {
+                map.Set(0, y, Tile.Make(TileType.HouseWall));
+                map.Set(w - 1, y, Tile.Make(TileType.HouseWall));
+            }
+
+            // Exit door (back to overworld) at bottom center
+            map.Set(w / 2, h - 1, Tile.Make(TileType.Door));
+
+            // Decorations / arena feel
+            // Left “easy” side
+            Rect(map, 4, 4, 7, 5, TileType.GrassShort);
+            // Center “medium” side
+            Rect(map, 12, 4, 7, 5, TileType.GrassTall);
+            // Right “hard” side
+            Rect(map, 20, 4, 7, 5, TileType.HouseWall); // like obstacles
 
             return map;
         }
 
-        
+
         public static Map BuildCave()
         {
             int w = 40, h = 20;

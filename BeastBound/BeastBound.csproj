@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Battle.cs" />
+    <Compile Include="BattleEngine.cs" />
     <Compile Include="Configurations.cs" />
     <Compile Include="Database.cs" />
     <Compile Include="Game.cs" />

@@ -36,7 +36,7 @@ namespace PokelikeConsole
             ConsoleColor fg, ConsoleColor bg)
         {
             Type = type;
-            IsWalkable = isWalkable;
+1            IsWalkable = isWalkable;
             GlyphAscii = glyphAscii;
             GlyphUnicode = glyphUnicode;
             Foreground = fg;
