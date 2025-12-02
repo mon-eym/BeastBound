@@ -54,7 +54,6 @@
     <Compile Include="Input.cs" />
     <Compile Include="Intro.cs" />
     <Compile Include="Map.cs" />
-    <Compile Include="Menu.cs" />
     <Compile Include="Npc.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="PokemonFactory\PokemonFactory.cs" />

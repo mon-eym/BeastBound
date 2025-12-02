@@ -11,7 +11,7 @@ namespace PokelikeConsole
         private readonly Npc[] _npcs;
 
         private bool _running = true;
-        private const int TargetFps = 30;
+        private const int TargetFps = 500;
 
         public Game()
         {
