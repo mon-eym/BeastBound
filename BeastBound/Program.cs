@@ -1,41 +1,25 @@
-﻿using System;
-using System.Threading;
+﻿using Beastbound.Intro;
+using Beastbound.Menu;
+using Beastbound.Utils;
 using WindowsInput;
 using WindowsInput.Native;
 
-namespace PokelikeConsole
+namespace Beastbound
 {
-    internal static class Program
+    internal class Program
     {
-        static void Main()
+        static void Main(string[] args)
         {
-            Console.Title = "Pokémon-style Console Map (C#)";
+            Console.Title = "Beastbound";
             Console.CursorVisible = false;
+            ConsoleUI.Init();
 
-            // Optional: improve line drawing
-            try { Console.OutputEncoding = System.Text.Encoding.UTF8; } catch { }
-
-            // Wait briefly to ensure console is initialized
-            Thread.Sleep(500);
-
-            // Simulate Alt+Enter to toggle fullscreen
+            // Simulate Alt + Enter to go full screen
             var sim = new InputSimulator();
             sim.Keyboard.ModifiedKeyStroke(VirtualKeyCode.MENU, VirtualKeyCode.RETURN);
 
-            // Show intro AFTER fullscreen
-            Intro.Show();
-
-            Game game = null;
-            try
-            {
-                game = new Game();
-                game.Run();
-            }
-            finally
-            {
-                if (game != null)
-                    game.Dispose();
-            }
+            IntroRunner.Play();
+            MainMenu.Show();
         }
     }
 }
