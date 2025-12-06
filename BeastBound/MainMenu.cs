@@ -16,6 +16,7 @@ namespace Beastbound.Menu
                 var options = new[]
                 {
                     "Start Battle",
+                    "How to play",
                     "Credits",
                     "Exit"
                 };
@@ -26,9 +27,13 @@ namespace Beastbound.Menu
                 {
                     BattleEngine.RunSingleBattle();
                 }
-                else if (choice == 1)
+                else if (choice == 2)
                 {
                     ShowCredits();
+                }
+                else if (choice == 1)
+                {
+                    ShowHowToPlay();
                 }
                 else
                 {
@@ -46,6 +51,15 @@ namespace Beastbound.Menu
             ConsoleUI.WriteCentered("Inspired by classic monster battles and B2W2 pacing", 8, ConsoleColor.DarkGray);
             ConsoleUI.WriteCentered("Design & Code: You + Copilot", 10, ConsoleColor.Gray);
             ConsoleUI.WriteCentered("Press any key to return", 14, ConsoleColor.DarkGray);
+            Console.ReadKey(true);
+        }
+
+        private static void ShowHowToPlay()
+        {
+            Console.Clear();
+            ConsoleUI.DrawFrame("How to Play");
+            ConsoleUI.WriteCentered("Instructions on how to play the game will go here.", 6, ConsoleColor.White);
+            ConsoleUI.WriteCentered("Press any key to return", 10, ConsoleColor.DarkGray);
             Console.ReadKey(true);
         }
     }

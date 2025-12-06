@@ -30,7 +30,7 @@ namespace Beastbound.Intro
                 @"██████╔╝███████╗██║  ██║███████║   ██║   ██████╔╝╚██████╔╝╚██████╔╝██║ ╚████║██████╔╝",
                 @"╚═════╝ ╚══════╝╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═════╝  ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚═════╝ ",
                 "",
-                "                               BEASTBOUND: CONSOLE EDITION"
+                "                            BEASTBOUND: CONSOLE EDITION"
             };
 
             int logoWidth = logo.Max(line => line.Length);
@@ -48,17 +48,7 @@ namespace Beastbound.Intro
             string tagline = "Bound by instincts. Forged in battle.";
             TextFx.TypeLineCentered(tagline, logoStartY + logo.Length + 1, ConsoleColor.DarkGray, 6);
 
-            // Beasts slide in (positioned relative to logo edges)
-            string leftBeast = "ᘛ⁐ᕐᐷ";
-            string rightBeast = "ᕙ(⇀‸↼‶)ᕗ";
-            int beastY = logoStartY - 1;
-            for (int t = 0; t < 10; t++)
-            {
-                ConsoleUI.WriteAt(logoStartX - 10 + t, beastY, leftBeast, ConsoleColor.Cyan);
-                ConsoleUI.WriteAt(logoStartX + logoWidth + 10 - t, beastY, rightBeast, ConsoleColor.Magenta);
-                Thread.Sleep(18);
-            }
-
+          
             // Prompt
             TextFx.BlinkCentered("Press any key to begin", logoStartY + logo.Length + 4, ConsoleColor.White, 3, 70);
             Console.ReadKey(true);
