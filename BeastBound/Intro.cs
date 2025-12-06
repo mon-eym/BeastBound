@@ -54,6 +54,8 @@ namespace Beastbound.Intro
             Console.ReadKey(true);
         }
 
+        // Charizard model
+
         private static void DrawFrame(int width, int height)
         {
             for (int x = 0; x < width; x++)

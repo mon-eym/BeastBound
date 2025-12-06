@@ -7,6 +7,7 @@ namespace Beastbound.Battle
 {
     public static class BattleEngine
     {
+        
         private static readonly Random Rng = new Random();
 
         public static void RunSingleBattle()

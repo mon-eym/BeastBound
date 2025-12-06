@@ -13,6 +13,7 @@ namespace Beastbound.Menu
             {
                 Console.Clear();
                 ConsoleUI.DrawFrame("Main Menu");
+                
                 var options = new[]
                 {
                     "Start Battle",
