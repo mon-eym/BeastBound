@@ -2,6 +2,7 @@
 using Beastbound.Battle;
 using Beastbound.Utils;
 using Beastbound;
+using BeastBound;
 
 namespace Beastbound.Menu
 {
@@ -26,7 +27,18 @@ namespace Beastbound.Menu
 
                 if (choice == 0)
                 {
-                    BattleEngine.RunSingleBattle();
+                    Console.Clear();
+                    ConsoleUI.DrawPanel("Starter Selection");
+                    Beastbound.Menu.PokemonMenu.Show(); // Show Pokémon starter menu
+
+                    // Optional: show selected Pokémon before battle
+                    Console.Clear();
+                    ConsoleUI.DrawPanel("Battle Begins");
+                    ConsoleUI.WriteCentered($"You chose {PokemonMenu.SelectedPokemon}!", 6, ConsoleColor.White);
+                    ConsoleUI.WriteCentered("Prepare to face your first opponent...", 8, ConsoleColor.DarkGray);
+                    Console.ReadKey(true);
+
+                    BattleEngine.RunSingleBattle(); // Start the battle
                 }
                 else if (choice == 2)
                 {
@@ -42,6 +54,12 @@ namespace Beastbound.Menu
                     return;
                 }
             }
+        }
+
+        public static void WallpaperOverlay()
+        {
+            Console.Clear();
+            Wallpaper.DrawPokemonBG();
         }
 
         private static void ShowCredits()

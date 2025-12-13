@@ -135,51 +135,47 @@ namespace Beastbound.Utils
             System.Threading.Thread.Sleep(600);
         }
 
-        public static void DrawPokemonBallOverlay()
+        public static void DrawPanel(string title)
         {
-            string[] ball = new[]
-            {
-        "                   ###*++======+++##%                     ",
-        "              @#*+====================+*#%                ",
-        "            #+=--=========================+#%             ",
-        "         #+       . ========================+*%           ",
-        "       #+     .      ==========================*#         ",
-        "      #.             ===========================+#        ",
-        "    %*- .     .     -=============================*%      ",
-        "   %*=..   .       -===============================+#     ",
-        "  #*===          .=============+*****+==============+#    ",
-        "  *=====.     .=============+=---------++============*%   ",
-        " #=========================+--=+  .. .*--=+===========#   ",
-        "%*=======================+=-==       .  +-=+==========+#  ",
-        "#===========+**+====--------= ..         =-++==========#  ",
-        "*=====++++=------------------            +-----=+++====*  ",
-        "*+++=-----------------------=   .        =----------+++*  ",
-        "#**--------------==+++=-:=--=-   .  .   +--------------+% ",
-        "#**+=----=+-:...    .  .  :=--+:     .+=-=-.:=+=-------+% ",
-        "#****+=  .           . .    ==---------==   .     :==--+ ",
-        "#=    .       . .       ..     =======              .  # ",
-        "#*                .             .       .       .  .  =# ",
-        " #.    . . .       .                    .             #  ",
-        "  #                   .    . ..  .   .               #   ",
-        "   * . .   .        .    .  . .  .      .           +%   ",
-        "    #     .    .  .                     .          #%    ",
-        "     #:           .                    .   .   . :#      ",
-        "      %+      .             .                   +%       ",
-        "        #+                     .            . =#         ",
-        "          #*..  .  .   .            .       *#           ",
-        "            %#+..       .                +##             ",
-        "                ##+.                .=##%                ",
-        "                     ######**#####%                      "
-    };
-
             int width = Console.WindowWidth;
-            int startY = Console.WindowHeight - ball.Length - 2;
-            int startX = (width - ball[0].Length) / 2;
+            Console.Clear();
 
-            for (int i = 0; i < ball.Length; i++)
-            {
-                ConsoleUI.WriteAt(startX, startY + i, ball[i], ConsoleColor.DarkRed);
-            }
+            // Top border
+            string border = new string('═', width);
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine(border);
+
+            // Centered title
+            int titleX = (width - title.Length) / 2;
+            Console.SetCursorPosition(titleX, 1);
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(title);
+
+            // Spacer line
+            Console.SetCursorPosition(0, 2);
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine(border);
+
+            Console.ResetColor();
         }
+
+        public static void DrawBox(int x, int y, int width, int height, ConsoleColor borderColor)
+        {
+            for (int i = 0; i < width; i++)
+            {
+                WriteAt(x + i, y, "═", borderColor);
+                WriteAt(x + i, y + height - 1, "═", borderColor);
+            }
+            for (int i = 0; i < height; i++)
+            {
+                WriteAt(x, y + i, "║", borderColor);
+                WriteAt(x + width - 1, y + i, "║", borderColor);
+            }
+            WriteAt(x, y, "╔", borderColor);
+            WriteAt(x + width - 1, y, "╗", borderColor);
+            WriteAt(x, y + height - 1, "╚", borderColor);
+            WriteAt(x + width - 1, y + height - 1, "╝", borderColor);
+        }
+
     }
 }
