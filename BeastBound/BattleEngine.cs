@@ -3,6 +3,7 @@ using Beastbound.Menu;
 using Beastbound.Models;
 using Beastbound.Utils;
 using System;
+using Beastbound.Audio;
 
 namespace Beastbound.Battle
 {
@@ -14,6 +15,9 @@ namespace Beastbound.Battle
         {
             Console.Clear();
             ConsoleUI.DrawFrame("Battle");
+
+            AudioManager.PlayLoop("Assets/Audio/boss.wav");
+            // Start boss battle...
 
 
             // Create player and enemy

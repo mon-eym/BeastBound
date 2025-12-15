@@ -1,15 +1,22 @@
 ﻿using Beastbound.Utils;
 using System.Linq;
 using System.Threading;
+using System.Media;
+using Beastbound.Audio;
 
 namespace Beastbound.Intro
 {
     public static class IntroRunner
     {
+
         public static void Play()
         {
             // Ensure fullscreen (focus + Alt+Enter + fallback maximize)
             FullscreenHelper.EnsureFullscreen();
+
+            AudioManager.PlayOnce("Assets/Audio/intro.wav");
+            // Show intro animation or logo...
+            AudioManager.Stop(); // Stop after intro finishes
 
             // Re-fetch updated dimensions and prep console
             Console.Clear();
@@ -54,8 +61,11 @@ namespace Beastbound.Intro
             Console.ReadKey(true);
         }
 
-        // Charizard model
-
+        public static void PlayIntroMusic()
+        {
+            Audio.AudioManager.PlayOnce("Assets/Audio/intro.wav");
+        }
+        
         private static void DrawFrame(int width, int height)
         {
             for (int x = 0; x < width; x++)

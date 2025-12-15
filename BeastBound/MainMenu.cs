@@ -3,6 +3,7 @@ using Beastbound.Battle;
 using Beastbound.Utils;
 using Beastbound;
 using BeastBound;
+using Beastbound.Audio;
 
 namespace Beastbound.Menu
 {
@@ -14,7 +15,18 @@ namespace Beastbound.Menu
             {
                 Console.Clear();
                 ConsoleUI.DrawFrame("Main Menu");
-                
+
+                AudioManager.PlayLoop("Assets/Audio/menu.wav");
+                // Render menu options...
+
+                string path = "Assets/Audio/menu.wav";
+                Console.WriteLine("Full path: " + Path.GetFullPath(path));
+
+                if (File.Exists(path))
+                    Console.WriteLine("✅ File found!");
+                else
+                    Console.WriteLine("❌ File NOT found!");
+
                 var options = new[]
                 {
                     "Start Battle",
@@ -56,12 +68,7 @@ namespace Beastbound.Menu
             }
         }
 
-        public static void WallpaperOverlay()
-        {
-            Console.Clear();
-            Wallpaper.DrawPokemonBG();
-        }
-
+        
         private static void ShowCredits()
         {
             Console.Clear();
