@@ -11,25 +11,20 @@ namespace Beastbound.Menu
 {
     public static class MainMenu
     {
-        public static void Show()
+        public static string Show()
         {
             while (true)
             {
                 Console.Clear();
                 ConsoleUI.DrawFrame("Main Menu");
 
-
-                // Render menu options...
-
-            
-
                 var options = new[]
                 {
-                    "Start Battle",
-                    "How to play",
-                    "Credits",
-                    "Exit"
-                };
+            "Start Battle",
+            "How to play",
+            "Credits",
+            "Exit"
+        };
 
                 int choice = ConsoleUI.Menu(options, highlightColor: ConsoleColor.Cyan);
 
@@ -37,34 +32,33 @@ namespace Beastbound.Menu
                 {
                     Console.Clear();
                     ConsoleUI.DrawPanel("Starter Selection");
-                    Beastbound.Menu.PokemonMenu.Show(); // Show Pokémon starter menu
+                    PokemonMenu.Show();
 
-                    // Optional: show selected Pokémon before battle
                     Console.Clear();
                     ConsoleUI.DrawPanel("Battle Begins");
                     ConsoleUI.WriteCentered($"You chose {PokemonMenu.SelectedPokemon}!", 6, ConsoleColor.White);
                     ConsoleUI.WriteCentered("Prepare to face your first opponent...", 8, ConsoleColor.DarkGray);
                     Console.ReadKey(true);
 
-                    BattleEngine.RunSingleBattle(); // Start the battle
-                }
-                else if (choice == 2)
-                {
-                    ShowCredits();
+                    return "start";
                 }
                 else if (choice == 1)
                 {
                     ShowHowToPlay();
                 }
+                else if (choice == 2)
+                {
+                    ShowCredits();
+                }
                 else
                 {
                     ConsoleUI.CleanExit();
-                    return;
+                    return "exit";
                 }
             }
         }
 
-        
+
         private static void ShowCredits()
         {
             Console.Clear();

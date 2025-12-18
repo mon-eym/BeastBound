@@ -15,29 +15,77 @@ namespace Beastbound
 
         static void Main(string[] args)
         {
-            Console.Title = "Beastbound";
+            Console.Title = "Beatdown";
             Console.CursorVisible = false;
             ConsoleUI.Init();
 
-            // Simulate Alt + Enter to go fullscreen
+            // Simulate Alt + Enter for fullscreen
             var sim = new InputSimulator();
             sim.Keyboard.ModifiedKeyStroke(VirtualKeyCode.MENU, VirtualKeyCode.RETURN);
 
+            // Play intro music and animation
+            Play("Audio/intro.wav");
+            IntroRunner.Play(); // Make sure this method returns cleanly
 
-            // Play intro asynchronously (doesn't freeze the game)
-            Play("Audio\\intro.wav");
+            // Switch to menu music
+            Stop();
+            PlayLoop("Audio/menu.wav");
 
-            // Run your intro animation / logic
-            IntroRunner.Play();
+            // Wait before showing menu
+            Thread.Sleep(100);
 
-            // Switch to menu music after intro
-            Stop(); // stop intro before starting menu
-            PlayLoop("Audio\\menu.wav");
-            MainMenu.Show();
+            while (true)
+            {
+                string menuResult = MainMenu.Show();
 
-            // Switch to boss music when battle starts
-            Stop(); // stop menu before starting boss
-            PlayLoop("Audio\\boss.wav");
+                if (menuResult == "start")
+                {
+                    int currentStage = 1;
+                    string selected = PokemonMenu.SelectedPokemon;
+
+                    while (currentStage <= 3) // ✅ only 3 stages
+                    {
+                        Stop();
+                        PlayLoop("Audio/boss.wav");
+
+                        bool playerWon = BattleEngine.StartBattle(selected, currentStage);
+
+                        if (!playerWon)
+                        {
+                            Console.Clear();
+                            ConsoleUI.WriteCentered("Game Over! Returning to Main Menu...", 10, ConsoleColor.DarkGray);
+                            Thread.Sleep(1500);
+                            break;
+                        }
+
+                        // ✅ Victory: allow Pokémon switch before next stage
+                        if (currentStage < 3)
+                        {
+                            Console.Clear();
+                            ConsoleUI.WriteCentered("You won! Do you want to switch Pokémon for the next stage?", 10, ConsoleColor.White);
+                            ConsoleUI.WriteCentered("Press Y to switch, any other key to continue.", 12, ConsoleColor.DarkGray);
+
+                            var key = Console.ReadKey(true).Key;
+                            if (key == ConsoleKey.Y)
+                            {
+                                PokemonMenu.Show();
+                                selected = PokemonMenu.SelectedPokemon;
+                            }
+                        }
+
+                        currentStage++;
+                    }
+
+                    // After defeat or finishing all stages, restart menu music
+                    Stop();
+                    PlayLoop("Audio/menu.wav");
+                }
+                else if (menuResult == "exit")
+                {
+                    ConsoleUI.CleanExit();
+                    return;
+                }
+            }
 
         }
 
@@ -66,6 +114,6 @@ namespace Beastbound
                 soundPlayer.Stop(); // stops current playback
             }
         }
-
     }
+
 }

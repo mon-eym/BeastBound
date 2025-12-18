@@ -12,7 +12,9 @@
         Dragon,
         Frost,
         Nature,
-        Normal
+        Normal,
+        Water,
+        Leaf
     }
 
     public static class TypeChart

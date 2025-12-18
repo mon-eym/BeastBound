@@ -17,24 +17,35 @@ namespace Beastbound.Battle
             // No scene box, no green lines
             // You can optionally add a subtle divider or leave it clean
         }
-        public static void DrawBattleHeader(Creature player, Creature enemy, string stageName, int difficulty)
+        public static void DrawBattleHeader(Creature player, Creature enemy, string stageLabel, int difficulty)
         {
-            int width = Console.WindowWidth;
+            Console.SetCursorPosition(0, 1);
+            string difficultyIcons = string.Concat(Enumerable.Repeat("🟢", difficulty));
+            ConsoleUI.WriteCentered($"🟢 {stageLabel} 🟢 Difficulty: {difficultyIcons}", 1, ConsoleColor.Yellow);
 
-            // Player info (left)
-            string playerInfo = $"{player.Name} 🔥 Lv.{player.Level}  HP: {player.CurrentHP}/{player.MaxHP}";
-            ConsoleUI.WriteAt(2, 1, playerInfo, ConsoleColor.Cyan);
+            // Player Info
+            string playerLine = $"{player.Name} 🔥 HP: {player.CurrentHP}/{player.MaxHP}";
+            string playerBar = GetHPBar(player.CurrentHP, player.MaxHP, 30);
+            ConsoleUI.WriteCentered(playerLine, 3, ConsoleColor.Cyan);
+            ConsoleUI.WriteCentered(playerBar, 4, ConsoleColor.Green);
 
-            // Enemy info (right)
-            string enemyInfo = $"{enemy.Name} 🌀 Lv.{enemy.Level}  HP: {enemy.CurrentHP}/{enemy.MaxHP}";
-            int enemyX = width - enemyInfo.Length - 2;
-            ConsoleUI.WriteAt(enemyX, 1, enemyInfo, ConsoleColor.Magenta);
+            // Enemy Info
+            string enemyLine = $"{enemy.Name} 🌐 HP: {enemy.CurrentHP}/{enemy.MaxHP}";
+            string enemyBar = GetHPBar(enemy.CurrentHP, enemy.MaxHP, 30);
+            ConsoleUI.WriteCentered(enemyLine, 6, ConsoleColor.Magenta);
+            ConsoleUI.WriteCentered(enemyBar, 7, ConsoleColor.Red);
+        }
 
-            // Stage + difficulty (centered)
-            string flames = string.Concat(Enumerable.Repeat("🔥", difficulty));
-            string centerInfo = $"🌿 {stageName} 🌿   Difficulty: {flames}";
-            int centerX = (width - centerInfo.Length) / 2;
-            ConsoleUI.WriteAt(centerX, 3, centerInfo, ConsoleColor.Green);
+
+        private static string GetHPBar(int current, int max, int width)
+        {
+            if (max <= 0) max = 1; // prevent divide-by-zero
+            current = Math.Max(0, Math.Min(current, max)); // clamp between 0 and max
+
+            int filled = (int)((double)current / max * width);
+            int empty = Math.Max(0, width - filled); // ensure non-negative
+
+            return "[" + new string('█', filled) + new string(' ', empty) + "]";
         }
 
         public static void DrawPanels(Creature player, Creature enemy)
@@ -119,29 +130,7 @@ namespace Beastbound.Battle
 
         }
 
-        private static void DrawAsciiCreature(string[] art, int x, int y, ConsoleColor color)
-        {
-            for (int i = 0; i < art.Length; i++)
-            {
-                ConsoleUI.WriteAt(x, y + i, art[i], color);
-            }
-        }
-
-
-        public static void AnimateHit(Creature target)
-        {
-            // Small shake
-            int x = target.IsPlayer ? 22 : 62;
-            int y = target.IsPlayer ? 15 : 12;
-            for (int i = 0; i < 6; i++)
-            {
-                ConsoleUI.WriteAt(x + (i % 2 == 0 ? 1 : -1), y, target.IsPlayer ? "(ง•̀_•́)ง" : "ᕦ(✧∇✧)ᕤ",
-                    target.IsPlayer ? ConsoleColor.Cyan : ConsoleColor.Magenta);
-                System.Threading.Thread.Sleep(20);
-                ConsoleUI.WriteAt(x, y, target.IsPlayer ? "(ง•̀_•́)ง" : "ᕦ(✧∇✧)ᕤ",
-                    target.IsPlayer ? ConsoleColor.Cyan : ConsoleColor.Magenta);
-            }
-        }
+ 
 
         public static int SelectMove(Creature player)
         {
@@ -164,22 +153,6 @@ namespace Beastbound.Battle
             }
         }
 
-        private static void DrawPanel(int x, int y, string name, int level, int hp, int maxHp, ConsoleColor color)
-        {
-            string typeIcon = name.Contains("Pyro") ? "🔥" : name.Contains("Tempest") ? "🌪️" : "🐾";
-            string label = $"{typeIcon} {name} Lv.{level}";
-            string hpText = $"HP: {hp}/{maxHp}";
-            string bar = HealthBar(hp, maxHp, 20);
-
-            // Top line: name + level
-            ConsoleUI.WriteAt(x, y, label, color);
-
-            // Second line: HP text
-            ConsoleUI.WriteAt(x, y + 1, hpText, ConsoleColor.White);
-
-            // Third line: HP bar
-            ConsoleUI.WriteAt(x, y + 2, $"[{bar}]", ConsoleColor.White);
-        }
 
         private static string HealthBar(int hp, int maxHp, int width)
         {

@@ -19,9 +19,9 @@ namespace Beastbound.Menu
             ConsoleUI.WriteCentered("⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨⇨", startY + 1, ConsoleColor.Gray);
 
             // Pokémon options
-            ConsoleUI.WriteCentered("[1] Charizard 🔥  — Strong vs Grass Boss", startY + 3, ConsoleColor.Red);
-            ConsoleUI.WriteCentered("[2] Blastoise 🌊  — Strong vs Fire Boss", startY + 5, ConsoleColor.Blue);
-            ConsoleUI.WriteCentered("[3] Venusaur 🌱   — Strong vs Water Boss", startY + 7, ConsoleColor.Green);
+            ConsoleUI.WriteCentered("[1] Charizard 🔥", startY + 3, ConsoleColor.Red);
+            ConsoleUI.WriteCentered("[2] Blastoise 🌊", startY + 5, ConsoleColor.Blue);
+            ConsoleUI.WriteCentered("[3] Venusaur 🌱", startY + 7, ConsoleColor.Green);
 
             ConsoleUI.WriteCentered("Press 1, 2, or 3 to choose", startY + 9, ConsoleColor.White);
 
