@@ -8,27 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Audio\boss.wav" />
-    <None Remove="Audio\intro.wav" />
-    <None Remove="Audio\menu.wav" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Audio\boss.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Audio\intro.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Audio\menu.wav">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="InputSimulator" Version="1.0.4" />
     <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="NAudio.Vorbis" Version="1.5.0" />
+    <PackageReference Include="System.Windows.Extensions" Version="10.0.1" />
   </ItemGroup>
 
 </Project>

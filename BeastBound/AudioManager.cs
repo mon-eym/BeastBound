@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 using System.IO;
 using NAudio.Wave;
 
@@ -30,7 +30,7 @@ namespace Beastbound.Audio
                 _reader?.Dispose();
                 _reader = null;
             }
-            catch { /* ignore */ }
+            catch { *//* ignore *//* }
         }
 
         private static void PlayInternal(string path, bool loop)
@@ -106,4 +106,4 @@ namespace Beastbound.Audio
             }
         }
     }
-}
+}*/

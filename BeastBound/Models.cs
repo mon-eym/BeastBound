@@ -15,6 +15,8 @@ namespace Beastbound.Models
         public int MaxHP { get; set; }
         public int CurrentHP { get; set; }
 
+        public static BattleType PlayerPrimaryType { get; set; }
+
         public int Attack { get; set; }
         public int Defense { get; set; }
         public int Speed { get; set; }

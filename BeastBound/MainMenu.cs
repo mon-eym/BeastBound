@@ -2,8 +2,10 @@
 using Beastbound.Battle;
 using Beastbound.Utils;
 using Beastbound;
+using System.Threading;
+using System.IO;
 using BeastBound;
-using Beastbound.Audio;
+using System.Media;
 
 namespace Beastbound.Menu
 {
@@ -16,16 +18,10 @@ namespace Beastbound.Menu
                 Console.Clear();
                 ConsoleUI.DrawFrame("Main Menu");
 
-                AudioManager.PlayLoop("Assets/Audio/menu.wav");
+
                 // Render menu options...
 
-                string path = "Assets/Audio/menu.wav";
-                Console.WriteLine("Full path: " + Path.GetFullPath(path));
-
-                if (File.Exists(path))
-                    Console.WriteLine("✅ File found!");
-                else
-                    Console.WriteLine("❌ File NOT found!");
+            
 
                 var options = new[]
                 {

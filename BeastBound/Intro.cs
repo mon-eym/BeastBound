@@ -14,10 +14,6 @@ namespace Beastbound.Intro
             // Ensure fullscreen (focus + Alt+Enter + fallback maximize)
             FullscreenHelper.EnsureFullscreen();
 
-            AudioManager.PlayOnce("Assets/Audio/intro.wav");
-            // Show intro animation or logo...
-            AudioManager.Stop(); // Stop after intro finishes
-
             // Re-fetch updated dimensions and prep console
             Console.Clear();
             Console.CursorVisible = false;
@@ -59,11 +55,6 @@ namespace Beastbound.Intro
             // Prompt
             TextFx.BlinkCentered("Press any key to begin", logoStartY + logo.Length + 4, ConsoleColor.White, 3, 70);
             Console.ReadKey(true);
-        }
-
-        public static void PlayIntroMusic()
-        {
-            Audio.AudioManager.PlayOnce("Assets/Audio/intro.wav");
         }
         
         private static void DrawFrame(int width, int height)

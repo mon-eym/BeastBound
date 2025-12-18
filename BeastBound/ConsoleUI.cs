@@ -17,6 +17,12 @@ namespace Beastbound.Utils
             catch { /* fallback silently */ }
         }
 
+        public static void DrawCreature(string name, int level, int currentHP, int maxHP, ConsoleColor color)
+        {
+            Console.ForegroundColor = color;
+            Console.WriteLine($"{name} Lv.{level} HP: {currentHP}/{maxHP}");
+            Console.ResetColor();
+        }
         public static void DrawFrame(string title)
         {
             Console.Clear();

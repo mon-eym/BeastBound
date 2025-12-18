@@ -40,23 +40,59 @@ namespace Beastbound.Battle
         public static void DrawPanels(Creature player, Creature enemy)
         {
             int width = Console.WindowWidth;
-            int spriteY = Console.WindowHeight / 2 - 10; // Adjust based on art height
+            int height = Console.WindowHeight;
+            int spriteY = height / 2 - 10; // Adjust for art height
 
-            // Player panel (top left)
-            DrawPanel(2, 5, player.Name, player.Level, player.CurrentHP, player.MaxHP, ConsoleColor.Cyan);
+            // 🧠 Draw HP bars at the top
+            string playerHP = $"{player.Name} Lv.{player.Level} HP: {player.CurrentHP}/{player.MaxHP}";
+            string enemyHP = $"{enemy.Name} Lv.{enemy.Level} HP: {enemy.CurrentHP}/{enemy.MaxHP}";
 
-            // Enemy panel (top right)
-            int enemyPanelX = width - 30;
-            DrawPanel(enemyPanelX, 5, enemy.Name, enemy.Level, enemy.CurrentHP, enemy.MaxHP, ConsoleColor.Magenta);
+            ConsoleUI.WriteAt(2, 2, playerHP, ConsoleColor.Cyan);
+            ConsoleUI.WriteAt(width - enemyHP.Length - 2, 2, enemyHP, ConsoleColor.Magenta);
 
-            // ASCII art models
-            if (player.Name.Contains("Pyrodon"))
-                DrawAsciiCreature(AsciiArtLibrary.Pyrodon, 5, spriteY, ConsoleColor.Cyan); // left side
+            // 🎨 Draw player ASCII art (left side, centered vertically)
+            string playerArt = player.Name switch
+            {
+                "Charizard" => AsciiArtLibrary.CharizardArt,
+                "Blastoise" => AsciiArtLibrary.BlastoiseArt,
+                "Venusaur" => AsciiArtLibrary.VenusaurArt,
+                _ => AsciiArtLibrary.CharizardArt
+            };
+            DrawAsciiCreature(playerArt, 5, spriteY, ConsoleColor.Cyan);
 
-            if (enemy.Name.Contains("???"))
-                DrawAsciiCreature(AsciiArtLibrary.GhostBoss, width - 55, spriteY, ConsoleColor.Magenta); // right side
+            // 🎨 Draw enemy ASCII art (right side, centered vertically)
+            string enemyArt = AsciiArtLibrary.GhostBoss; // Replace with TempestralArt if available
+            DrawAsciiCreature(enemyArt, width - 55, spriteY, ConsoleColor.Magenta);
         }
 
+        private static void DrawAsciiCreature(string art, int x, int y, ConsoleColor color)
+        {
+            var lines = art.Split('\n');
+            for (int i = 0; i < lines.Length; i++)
+            {
+                Console.SetCursorPosition(x, y + i);
+                Console.ForegroundColor = color;
+                Console.WriteLine(lines[i]);
+            }
+            Console.ResetColor();
+        }
+
+        public static void DrawMoveBox(Creature player)
+        {
+            int width = Console.WindowWidth;
+            int boxX = width / 2 - 28;
+            int boxY = Console.WindowHeight * 2 / 10;
+
+            ConsoleUI.DrawBox(boxX, boxY, 56, 7, ConsoleColor.DarkGray);
+            ConsoleUI.WriteAt(boxX + 2, boxY + 1, "Choose a move:", ConsoleColor.White);
+
+            for (int i = 0; i < player.Moves.Count && i < 4; i++)
+            {
+                var move = player.Moves[i];
+                string label = $"{i + 1}. {move.Name} - {move.Type} Pow: {move.Power} Acc: {move.Accuracy}%";
+                ConsoleUI.WriteAt(boxX + 2, boxY + 2 + i, label, ConsoleColor.Gray);
+            }
+        }
 
         public static void DrawMoveBar(Creature player)
         {

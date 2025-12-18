@@ -1,9 +1,11 @@
 ﻿using Beastbound;
+using Beastbound.Audio;
 using Beastbound.Menu;
 using Beastbound.Models;
 using Beastbound.Utils;
 using System;
-using Beastbound.Audio;
+using Beastbound.Battle;
+using System.Numerics;
 
 namespace Beastbound.Battle
 {
@@ -16,7 +18,6 @@ namespace Beastbound.Battle
             Console.Clear();
             ConsoleUI.DrawFrame("Battle");
 
-            AudioManager.PlayLoop("Assets/Audio/boss.wav");
             // Start boss battle...
 
 
@@ -113,6 +114,17 @@ namespace Beastbound.Battle
             return target.IsFainted;
         }
 
+        public static void StartBattle()
+        {
+            var (player, enemy) = Factory.CreateDemoDuel();
+            Creature.PlayerPrimaryType = player.PrimaryType;
+
+            BattleUI.DrawBackdrop();
+            BattleUI.DrawBattleHeader(player, enemy, "Forest Shrine", 2);
+            BattleUI.DrawPanels(player, enemy);
+            BattleUI.DrawMoveBox(player);
+        }
+
         private static Move ChooseEnemyMove(Creature enemy)
         {
             Move best = enemy.Moves[0];
@@ -131,10 +143,12 @@ namespace Beastbound.Battle
 
             double ScoreMove(Move m)
             {
-                double eff = TypeChart.Effectiveness(m.Type, Factory.PlayerPrimaryType);
+                double eff = TypeChart.Effectiveness(m.Type, Creature.PlayerPrimaryType);
                 return m.Power * eff * (m.Accuracy / 100.0);
             }
         }
+
+
 
         public static int CalculateDifficulty(int defeatedOpponents, string bossType)
         {
