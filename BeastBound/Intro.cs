@@ -33,7 +33,7 @@ namespace Beastbound.Intro
                 @"██████╔╝███████╗██║  ██║███████║   ██║   ██████╔╝╚██████╔╝╚██████╔╝██║ ╚████║██████╔╝",
                 @"╚═════╝ ╚══════╝╚═╝  ╚═╝╚══════╝   ╚═╝   ╚═════╝  ╚═════╝  ╚═════╝ ╚═╝  ╚═══╝╚═════╝ ",
                 "",
-                "                           BEASTBOUND: CONSOLE EDITION"
+                "                            BEASTBOUND: CONSOLE EDITION"
             };
 
             int logoWidth = logo.Max(line => line.Length);
