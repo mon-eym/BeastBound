@@ -17,7 +17,7 @@ namespace Beastbound.Battle
             // No scene box, no green lines
             // You can optionally add a subtle divider or leave it clean
         }
-        public static void DrawBattleHeader(Creature player, Creature enemy, string stageLabel, int difficulty)
+        public static void DrawBattleHeader(Creature player, Creature enemy, string stageLabel, int difficulty, int stageNumber)
         {
             Console.SetCursorPosition(0, 1);
             string difficultyIcons = string.Concat(Enumerable.Repeat("🟢", difficulty));
@@ -48,7 +48,7 @@ namespace Beastbound.Battle
             return "[" + new string('█', filled) + new string(' ', empty) + "]";
         }
 
-        public static void DrawPanels(Creature player, Creature enemy)
+        public static void DrawPanels(Creature player, Creature enemy, int stageNumber)
         {
             int width = Console.WindowWidth;
             int height = Console.WindowHeight;
@@ -72,19 +72,38 @@ namespace Beastbound.Battle
             DrawAsciiCreature(playerArt, 5, spriteY, ConsoleColor.Cyan);
 
             // 🎨 Draw enemy ASCII art (right side, centered vertically)
-            string enemyArt = AsciiArtLibrary.GhostBoss; // Replace with TempestralArt if available
+            string enemyArt = stageNumber switch
+            {
+                1 => AsciiArtLibrary.GhostBoss,
+                2 => AsciiArtLibrary.SecondBoss,
+                3 => AsciiArtLibrary.FinalBoss,
+                _ => AsciiArtLibrary.GhostBoss
+            };
             DrawAsciiCreature(enemyArt, width - 55, spriteY, ConsoleColor.Magenta);
+
+
         }
 
         private static void DrawAsciiCreature(string art, int x, int y, ConsoleColor color)
         {
             var lines = art.Split('\n');
+            int maxY = Console.BufferHeight - 1;
+            int maxX = Console.BufferWidth - 1;
+
             for (int i = 0; i < lines.Length; i++)
             {
-                Console.SetCursorPosition(x, y + i);
+                int drawY = y + i;
+                if (drawY < 0 || drawY > maxY) continue;
+
+                string line = lines[i];
+                int drawX = Math.Min(x, maxX - line.Length);
+                if (drawX < 0) continue;
+
+                Console.SetCursorPosition(drawX, drawY);
                 Console.ForegroundColor = color;
-                Console.WriteLine(lines[i]);
+                Console.WriteLine(line);
             }
+
             Console.ResetColor();
         }
 
@@ -132,12 +151,12 @@ namespace Beastbound.Battle
 
  
 
-        public static int SelectMove(Creature player)
+        public static int SelectMove(Creature player, int stageNumber)
         {
             Console.Clear();
             DrawBackdrop();
             var dummyEnemy = new Creature { Name = "???", Level = 50, CurrentHP = 100, MaxHP = 100 };
-            DrawPanels(player, dummyEnemy);
+            DrawPanels(player, dummyEnemy, stageNumber);
             DrawMoveBar(player);
 
             ConsoleUI.WriteCentered("Press 1–4 to choose your move", Console.WindowHeight / 2 + 8, ConsoleColor.White);

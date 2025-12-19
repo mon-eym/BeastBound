@@ -6,6 +6,7 @@ using Beastbound.Utils;
 using System;
 using Beastbound.Battle;
 using System.Numerics;
+using Beastbound.Ascii;
 
 namespace Beastbound.Battle
 {
@@ -25,12 +26,13 @@ namespace Beastbound.Battle
             };
 
             // Create enemy
-            Creature enemy = Factory.CreateBoss(stageNumber);
+            Creature enemy = Factory.CreateBoss(stageNumber, selectedName);
             Creature.PlayerPrimaryType = player.PrimaryType;
 
+            // Initial draw
             BattleUI.DrawBackdrop();
-            BattleUI.DrawBattleHeader(player, enemy, $"Stage {stageNumber}", 2);
-            BattleUI.DrawPanels(player, enemy);
+            BattleUI.DrawBattleHeader(player, enemy, $"Stage {stageNumber}", 2, stageNumber);
+            BattleUI.DrawPanels(player, enemy, stageNumber);
             BattleUI.DrawMoveBox(player);
 
             // ✅ Main battle loop
@@ -39,17 +41,17 @@ namespace Beastbound.Battle
                 // --- Player turn ---
                 int moveIndex = GetPlayerMoveIndex(player.Moves);
                 Move playerMove = player.Moves[moveIndex];
-                ExecuteTurnStep(player, enemy, playerMove);
+                ExecuteTurnStep(player, enemy, playerMove, stageNumber);
 
                 if (enemy.IsFainted) break;
 
                 // --- Enemy turn ---
                 Move enemyMove = ChooseEnemyMove(enemy);
-                ExecuteTurnStep(enemy, player, enemyMove);
+                ExecuteTurnStep(enemy, player, enemyMove, stageNumber);
 
                 // Redraw UI
-                BattleUI.DrawBattleHeader(player, enemy, $"Stage {stageNumber}", 2);
-                BattleUI.DrawPanels(player, enemy);
+                BattleUI.DrawBattleHeader(player, enemy, $"Stage {stageNumber}", 2, stageNumber);
+                BattleUI.DrawPanels(player, enemy, stageNumber);
                 BattleUI.DrawMoveBox(player);
             }
 
@@ -92,7 +94,7 @@ namespace Beastbound.Battle
         }
 
         // --- Turn execution ---
-        private static bool ExecuteTurnStep(Creature user, Creature target, Move move)
+        private static bool ExecuteTurnStep(Creature user, Creature target, Move move, int stageNumber)
         {
             if (user.IsFainted || target.IsFainted) return target.IsFainted;
 
@@ -107,7 +109,7 @@ namespace Beastbound.Battle
 
             ConsoleUI.WriteLog($"{user.Name} used {move.Name}! (-{damage} HP)", ConsoleColor.White);
 
-            BattleUI.DrawPanels(user, target);
+            BattleUI.DrawPanels(user, target, stageNumber);
             return target.IsFainted;
         }
 
@@ -172,7 +174,7 @@ namespace Beastbound.Battle
         // --- Difficulty scaling ---
         public static int CalculateDifficulty(int defeatedOpponents, string bossType)
         {
-            int baseDifficulty = 1 + defeatedOpponents * 2;
+            int baseDifficulty = 1 + defeatedOpponents * 3;
 
             if ((PokemonMenu.SelectedPokemon == "Charizard" && bossType == "Grass") ||
                 (PokemonMenu.SelectedPokemon == "Blastoise" && bossType == "Fire") ||
@@ -188,5 +190,6 @@ namespace Beastbound.Battle
             return Math.Max(1, baseDifficulty);
         }
     }
+
 
 }

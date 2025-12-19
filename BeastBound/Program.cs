@@ -79,7 +79,7 @@ namespace Beastbound
                     // After defeat or finishing all stages, restart menu music
                     Stop();
                     PlayLoop("Audio/menu.wav");
-                }
+                } 
                 else if (menuResult == "exit")
                 {
                     ConsoleUI.CleanExit();

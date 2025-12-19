@@ -41,8 +41,9 @@ public static class Factory
     }
 
     // ✅ Boss selector by stage
-    public static Creature CreateBoss(int stageNumber)
+    public static Creature CreateBoss(int stageNumber, string selectedName)
     {
+        
         return stageNumber switch
         {
             1 => GhostBoss(),   // weak to Charizard
